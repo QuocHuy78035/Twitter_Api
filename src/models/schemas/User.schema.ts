@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb'
+import { VerifyUserStatus } from '~/constants/enums'
 
 interface UserType {
   _id?: ObjectId
@@ -18,12 +19,6 @@ interface UserType {
   username?: string //option
   avatar?: string //optional
   cover_photo?: string //optional
-}
-
-enum VerifyUserStatus {
-  Unverified, //chua verify mac dinh = 0
-  Verified, //da verify
-  Banned //tai khoan bi ban
 }
 
 export default class User {

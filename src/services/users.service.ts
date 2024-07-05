@@ -1,10 +1,13 @@
 import User from '~/models/schemas/User.schema'
 import databaseService from './database.service'
+import { RegisterRequestBody } from '~/models/requests/User.requests'
 
 class UsersService {
-  async register(payload: { email: string; password: string }) {
-    const { email, password } = payload
-    const result = await databaseService.users.insertOne(new User({ email: email, password: password }))
+  async register(payload: RegisterRequestBody) {
+    const result = await databaseService.users.insertOne(
+      //date_of_birth: new Date(payload.date_of_birth) vi date of birth quy dinh trong userSchema la kieu Date => convert string iso nguoi dung truyen vao sang Date()
+      new User({ ...payload, date_of_birth: new Date(payload.date_of_birth) })
+    )
     return result
   }
 
