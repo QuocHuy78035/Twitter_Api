@@ -3,3 +3,10 @@ export enum VerifyUserStatus {
   Verified, //da verify
   Banned //tai khoan bi ban
 }
+
+export enum TokenType {
+  AccessToken,
+  RefreshToken,
+  ForgotPasswordToken,
+  EmailVerifyToken
+}
