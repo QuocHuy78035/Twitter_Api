@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { checkSchema } from 'express-validator'
+import HTTP_STATUS from '~/constants/http.status'
+import { ErrorWithMessage } from '~/models/errors/Errors'
 import userService from '~/services/users.service'
 import { validate } from '~/utils/validation'
 
@@ -40,7 +42,7 @@ export const registerValidator = validate(
         options: async (value) => {
           const isExitEmail = await userService.checkEmailExit(value)
           if (isExitEmail) {
-            throw new Error('Email already exits.')
+            throw new ErrorWithMessage({ message: 'Email already exits', status: HTTP_STATUS.BAD_REQUEST })
           }
           return true
         }

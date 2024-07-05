@@ -18,7 +18,7 @@ export class DatabaseService {
       await this.db.command({ ping: 1 })
       console.log('Connect to mongoDB successfully!')
     } catch (e) {
-      console.log(e)
+      //console.log(e)
     }
   }
 
