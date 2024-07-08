@@ -4,6 +4,8 @@ import { RegisterRequestBody } from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enums'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import { ObjectId } from 'mongodb'
 
 class UsersService {
   private signAccessToken(user_id: string) {
@@ -30,16 +32,20 @@ class UsersService {
     })
   }
 
+  private signAccessTokenAndRefreshToken(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
+  }
+
   async register(payload: RegisterRequestBody) {
     const result = await databaseService.users.insertOne(
       //date_of_birth: new Date(payload.date_of_birth) vi date of birth quy dinh trong userSchema la kieu Date => convert string iso nguoi dung truyen vao sang Date()
       new User({ ...payload, date_of_birth: new Date(payload.date_of_birth), password: hashPassword(payload.password) })
     )
     const user_id = result.insertedId.toString()
-    const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
-    ])
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ token: refreshToken, user_id: new ObjectId(user_id) })
+    )
     return {
       user_id,
       accessToken,
@@ -53,6 +59,17 @@ class UsersService {
       return true
     }
     return false
+  }
+
+  async login(user_id: string) {
+    const [accessToken, refreshToken] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ token: refreshToken, user_id: new ObjectId(user_id) })
+    )
+    return {
+      accessToken,
+      refreshToken
+    }
   }
 }
 
