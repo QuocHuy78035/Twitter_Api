@@ -17,5 +17,12 @@ export const USER_MESSAGE = {
     'Confirm password must be at least 6 characters long and contain at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 symbol.',
   CONFIRM_PASSWORD_LENGTH_MUST_BE_6_255: 'Confirm password lenth must be from 6 to 255',
   DATE_OF_BIRTH_MUST_BE_ISO8601_FORMAT: 'Date of birth must be iso8601 format',
-  INCORRECT_EMAIL_OR_PASSWORD: 'Incorrect email or password'
+  INCORRECT_EMAIL_OR_PASSWORD: 'Incorrect email or password',
+  ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
+  REFRESH_TOKEN_IS_NOT_EXITS: 'Refresh token is not exits',
+  REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+  LOGIN_SUCCESS: 'Login user successfully!',
+  REGISTER_SUCCESS: 'Register user successfully!',
+  LOGOUT_SUCCESS: 'Log out user successfully!'
 }

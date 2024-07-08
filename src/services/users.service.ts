@@ -6,6 +6,8 @@ import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
+import { config } from 'dotenv'
+config()
 
 class UsersService {
   private signAccessToken(user_id: string) {
@@ -70,6 +72,10 @@ class UsersService {
       accessToken,
       refreshToken
     }
+  }
+
+  async logout(refresh_token: string) {
+    await databaseService.refreshToken.deleteOne({ token: refresh_token })
   }
 }
 
