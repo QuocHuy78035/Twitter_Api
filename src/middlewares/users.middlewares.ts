@@ -1,8 +1,10 @@
 import { error } from 'console'
 import { check, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { ObjectId } from 'mongodb'
 import HTTP_STATUS from '~/constants/http.status'
 import { USER_MESSAGE } from '~/constants/message'
+import { REGEX_USER_NAME } from '~/constants/regex'
 import { ErrorWithStatus } from '~/models/errors/Errors'
 import databaseService from '~/services/database.service'
 import userService from '~/services/users.service'
@@ -272,7 +274,7 @@ export const updateMeValidator = validate(
         isLength: {
           errorMessage: USER_MESSAGE.NAME_LENGTH_MUST_BE_3_TO_100,
           options: {
-            min: 3,
+            min: 1,
             max: 100
           }
         }
@@ -310,6 +312,21 @@ export const updateMeValidator = validate(
         optional: true,
         isString: {
           errorMessage: USER_MESSAGE.USER_NAME_MUST_BE_A_STRING
+        },
+        custom: {
+          options: async (value, { req }) => {
+            if (!REGEX_USER_NAME.test(value)) {
+              throw new Error(USER_MESSAGE.USER_NAME_INVALID)
+            }
+            const user = await databaseService.users.findOne({ username: value })
+            if (user) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.USER_NAME_ALREADY_EXITS,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+            return true
+          }
         }
       },
       avatar: {
@@ -326,5 +343,59 @@ export const updateMeValidator = validate(
       }
     },
     ['body']
+  )
+)
+
+export const followUserValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: {
+        custom: {
+          options: async (value: string, { req }) => {
+            // if (!ObjectId.isValid(value)) {
+            //   throw new ErrorWithStatus({
+            //     message: USER_MESSAGE.FOLLOWED_USER_ID_IS_INVALID,
+            //     status: HTTP_STATUS.BAD_REQUEST
+            //   })
+            // }
+            const follower_user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+            if (!follower_user) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.FOLLOWER_USER_NOT_FOUND,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const UnFollowUserValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: {
+        custom: {
+          options: async (value: string, { req }) => {
+            // if (!ObjectId.isValid(value)) {
+            //   throw new ErrorWithStatus({
+            //     message: USER_MESSAGE.FOLLOWED_USER_ID_IS_INVALID,
+            //     status: HTTP_STATUS.BAD_REQUEST
+            //   })
+            // }
+            const user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+            if (!user) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.USER_NOT_FOUND,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+          }
+        }
+      }
+    },
+    ['params']
   )
 )

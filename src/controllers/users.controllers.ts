@@ -5,6 +5,7 @@ import {
   FollowRequestBody,
   RegisterRequestBody,
   TokenPayLoad,
+  UnFollowRequestParams,
   UpdateMeRequestBody
 } from '~/models/requests/User.requests'
 import userService from '~/services/users.service'
@@ -97,6 +98,22 @@ export const followController = async (
   const user_id: string = decoded.user_id
   const followed_user_id: string = req.body.followed_user_id
   const result = await userService.followUser(user_id, followed_user_id)
+  return res.status(200).json({
+    message: result
+  })
+}
+
+export const unFollowUserController = async (
+  req: Request<ParamsDictionary, any, UnFollowRequestParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.headers.authorization || ''
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  const user_id: string = decoded.user_id
+  const followed_user_id = req.params.followed_user_id
+
+  const result = await userService.unFollowUser(user_id, followed_user_id)
   return res.status(200).json({
     message: result
   })

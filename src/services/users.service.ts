@@ -8,6 +8,7 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import { config } from 'dotenv'
 import { USER_MESSAGE } from '~/constants/message'
+import Follower from '~/models/schemas/Follower.schema'
 config()
 
 class UsersService {
@@ -135,11 +136,36 @@ class UsersService {
   }
 
   async followUser(user_id: string, followed_user_id: string) {
-    await databaseService.followers.insertOne({
+    const follower = await databaseService.followers.findOne({
       user_id: new ObjectId(user_id),
       followed_user_id: new ObjectId(followed_user_id)
     })
-    return USER_MESSAGE.FOLLOW_SUCCESSFULLY
+    if (!follower) {
+      await databaseService.followers.insertOne(
+        new Follower({
+          user_id: new ObjectId(user_id),
+          followed_user_id: new ObjectId(followed_user_id)
+        })
+      )
+      return USER_MESSAGE.FOLLOW_SUCCESSFULLY
+    }
+    return USER_MESSAGE.ALREADY_FOLLOWED_USER
+  }
+
+  async unFollowUser(user_id: string, followed_user_id: string) {
+    const user_followed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (!user_followed) {
+      return USER_MESSAGE.NOT_FOLLOW_USER
+    } else {
+      await databaseService.followers.deleteOne({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id)
+      })
+      return USER_MESSAGE.UN_FOLLOW_SUCCESS
+    }
   }
 }
 

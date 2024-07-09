@@ -22,6 +22,7 @@ export const USER_MESSAGE = {
   REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
   REFRESH_TOKEN_IS_NOT_EXITS: 'Refresh token is not exits',
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+  FOLLOWED_USER_ID_IS_INVALID: `Followed userid is invalid`,
   LOGIN_SUCCESS: 'Login user successfully!',
   REGISTER_SUCCESS: 'Register user successfully!',
   LOGOUT_SUCCESS: 'Log out user successfully!',
@@ -35,4 +36,13 @@ export const USER_MESSAGE = {
   UPDATE_ME_SUCCESS: `Update me sucessfully`,
   GET_PROFILE_SUCCESS: `Get profile successfully`,
   FOLLOW_SUCCESSFULLY: `Follow user successfully`,
+  ALREADY_FOLLOWED_USER: 'You already followed this user',
+  FOLLOWER_USER_NOT_FOUND: 'Follower user not found',
+  FOLLOWED_USER_NOT_FOUND: 'Follwed user not found',
+  USER_NOT_FOUND: 'User not found',
+  NOT_FOLLOW_USER: 'You not follow this user',
+  UN_FOLLOW_SUCCESS: 'Unfollow user success',
+  USER_NAME_INVALID:
+    'Username must be 4-15 characters long and contain only letters, numbers and underscores, not only numbers',
+  USER_NAME_ALREADY_EXITS: 'Username already exits'
 }

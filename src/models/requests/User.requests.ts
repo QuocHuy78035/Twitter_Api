@@ -30,6 +30,10 @@ export interface FollowRequestBody {
   followed_user_id: string
 }
 
+export interface UnFollowRequestParams {
+  user_id: string
+}
+
 // export interface ToKenPayload extends JwtPayload {
 //   user_id: string
 //   token_type: TokenType
