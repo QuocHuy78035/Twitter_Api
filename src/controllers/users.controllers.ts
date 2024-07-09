@@ -118,3 +118,14 @@ export const unFollowUserController = async (
     message: result
   })
 }
+
+export const changePasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { new_password, new_password_confirm } = req.body
+  const token = req.headers.authorization || ''
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  const user_id: string = decoded.user_id
+  const result = await userService.changePassword(new_password, new_password_confirm, user_id)
+  return res.status(200).json({
+    message: result
+  })
+}

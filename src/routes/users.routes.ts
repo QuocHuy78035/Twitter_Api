@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  changePasswordController,
   followController,
   getMeController,
   getProfileController,
@@ -11,6 +12,7 @@ import {
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
+  ChangePasswordValidator,
   followUserValidator,
   loginValidator,
   refreshTokenValidator,
@@ -82,7 +84,7 @@ userRouter.get('/:username', accessTokenValidator, wrapRequestHandler(getProfile
 userRouter.post('/follow', accessTokenValidator, followUserValidator, wrapRequestHandler(followController))
 
 /*
- - Description: un follow someone
+ - Description: unfollow someone
  - Path: /follow/:followed_user_id
  - Method: Delete
  - Header: {Authorization: Bearer <access_token>}
@@ -93,5 +95,14 @@ userRouter.delete(
   UnFollowUserValidator,
   wrapRequestHandler(unFollowUserController)
 )
+
+/*
+ - Description: change password
+ - Path: /user/password
+ - Method: Put
+ - Header: {Authorization: Bearer <access_token>}
+ - Body: {'old_password' : string, 'new_password': string, 'new_password_confirm' : string}
+*/
+userRouter.put('/password', accessTokenValidator, ChangePasswordValidator, wrapRequestHandler(changePasswordController))
 
 export default userRouter

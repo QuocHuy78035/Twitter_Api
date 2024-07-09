@@ -1,5 +1,4 @@
-import { error } from 'console'
-import { check, checkSchema } from 'express-validator'
+import { checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import HTTP_STATUS from '~/constants/http.status'
@@ -11,6 +10,9 @@ import userService from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
+import { Request } from 'express'
+import { TokenPayLoad } from '~/models/requests/User.requests'
+import { jwtDecode } from 'jwt-decode'
 
 export const loginValidator = validate(
   checkSchema(
@@ -397,5 +399,87 @@ export const UnFollowUserValidator = validate(
       }
     },
     ['params']
+  )
+)
+
+export const ChangePasswordValidator = validate(
+  checkSchema(
+    {
+      old_password: {
+        custom: {
+          options: async (value: string, { req }) => {
+            const token = (req as Request).headers.authorization || ''
+            const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+            const user_id: string = decoded.user_id
+            const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+            if (!user) {
+              throw new ErrorWithStatus({ message: USER_MESSAGE.USER_NOT_FOUND, status: HTTP_STATUS.BAD_REQUEST })
+            }
+            const password = user?.password
+            if (hashPassword(value) != password) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGE.OLD_PASSWORD_NOT_MATCH,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+          }
+        }
+      },
+      new_password: {
+        isStrongPassword: {
+          options: {
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1
+          },
+          errorMessage: USER_MESSAGE.PASSWORD_IS_NOT_STRONG
+        },
+        notEmpty: true,
+        isString: true,
+        isLength: {
+          errorMessage: USER_MESSAGE.PASSWORD_LENGTH_MUST_BE_6_255,
+          options: {
+            min: 6,
+            max: 255
+          }
+        },
+        trim: true
+      },
+      new_password_confirm: {
+        isStrongPassword: {
+          options: {
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1
+          },
+          errorMessage: USER_MESSAGE.CONFIRM_PASSWORD_IS_NOT_STRONG
+        },
+        custom: {
+          options: (value, { req }) => {
+            if (value != req.body.new_password) {
+              throw new Error(USER_MESSAGE.PASSWORD_AND_PASSWORD_CONFIRM_NOT_MATCH)
+            }
+            return true
+          }
+        },
+        notEmpty: {
+          errorMessage: USER_MESSAGE.COMFIRM_PASSWORD_IS_REQUIRED
+        },
+        isString: true,
+        isLength: {
+          errorMessage: USER_MESSAGE.CONFIRM_PASSWORD_LENGTH_MUST_BE_6_255,
+          options: {
+            min: 6,
+            max: 255
+          }
+        },
+        trim: true
+      }
+    },
+    ['body']
   )
 )
