@@ -288,7 +288,10 @@ export const updateMeValidator = validate(
         }
       },
       bio: {
-        optional: true
+        optional: true,
+        isString: {
+          errorMessage: USER_MESSAGE.BIO_MUST_BA_A_STRING
+        }
       },
       location: {
         optional: true,

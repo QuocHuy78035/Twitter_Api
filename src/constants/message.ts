@@ -30,5 +30,9 @@ export const USER_MESSAGE = {
   WEBSITE_MUST_BE_A_STRING: `Website must be a string`,
   USER_NAME_MUST_BE_A_STRING: `Username must be a string`,
   AVATAR_MUST_BE_A_STRING: 'Avatar must be a string',
-  COVER_PHOTO_MUST_BE_A_STRING: `Cover photo must be a string`
+  COVER_PHOTO_MUST_BE_A_STRING: `Cover photo must be a string`,
+  BIO_MUST_BA_A_STRING: 'Bio must be a string',
+  UPDATE_ME_SUCCESS: `Update me sucessfully`,
+  GET_PROFILE_SUCCESS: `Get profile successfully`,
+  FOLLOW_SUCCESSFULLY: `Follow user successfully`,
 }

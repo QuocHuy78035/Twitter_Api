@@ -1,12 +1,13 @@
 import User from '~/models/schemas/User.schema'
 import databaseService from './database.service'
-import { RegisterRequestBody } from '~/models/requests/User.requests'
+import { RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import { config } from 'dotenv'
+import { USER_MESSAGE } from '~/constants/message'
 config()
 
 class UsersService {
@@ -90,6 +91,55 @@ class UsersService {
       }
     )
     return user
+  }
+
+  async updateMe(user_id: string, body: UpdateMeRequestBody) {
+    const _body = body.date_of_birth ? { ...body, date_of_birth: new Date(body.date_of_birth) } : body
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { ...(_body as UpdateMeRequestBody & { date_of_birth?: Date }) },
+        $currentDate: {
+          update_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0
+        }
+      }
+    )
+    return user
+  }
+
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      { username: username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          created_at: 0,
+          updated_at: 0,
+          update_at: 0
+        }
+      }
+    )
+    return user
+  }
+
+  async followUser(user_id: string, followed_user_id: string) {
+    await databaseService.followers.insertOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    return USER_MESSAGE.FOLLOW_SUCCESSFULLY
   }
 }
 

@@ -26,6 +26,10 @@ export interface UpdateMeRequestBody {
   cover_photo?: string
 }
 
+export interface FollowRequestBody {
+  followed_user_id: string
+}
+
 // export interface ToKenPayload extends JwtPayload {
 //   user_id: string
 //   token_type: TokenType

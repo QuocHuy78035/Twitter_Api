@@ -1,5 +1,13 @@
 import { Router } from 'express'
-import { getMeController, loginController, logoutController, registerController } from '~/controllers/users.controllers'
+import {
+  followController,
+  getMeController,
+  getProfileController,
+  loginController,
+  logoutController,
+  registerController,
+  updateMeController
+} from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
   loginValidator,
@@ -51,6 +59,23 @@ userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
  - Header: {Authorization: Bearer <access_token>}
  - Body: UserSchema
 */
-userRouter.patch('/me', accessTokenValidator, updateMeValidator, wrapRequestHandler(getMeController))
+userRouter.patch('/me', accessTokenValidator, updateMeValidator, wrapRequestHandler(updateMeController))
+
+/*
+ - Description: get profile
+ - Path: /:username
+ - Method: Get
+ - Header: {Authorization: Bearer <access_token>}
+*/
+userRouter.get('/:username', accessTokenValidator, wrapRequestHandler(getProfileController))
+
+/*
+ - Description: follow someone
+ - Path: /follow
+ - Method: post
+ - Header: {Authorization: Bearer <access_token>}
+ - Body: {'followed_user_id' : string}
+*/
+userRouter.post('/follow', accessTokenValidator, wrapRequestHandler(followController))
 
 export default userRouter

@@ -1,9 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { USER_MESSAGE } from '~/constants/message'
-import { RegisterRequestBody, TokenPayLoad } from '~/models/requests/User.requests'
+import {
+  FollowRequestBody,
+  RegisterRequestBody,
+  TokenPayLoad,
+  UpdateMeRequestBody
+} from '~/models/requests/User.requests'
 import userService from '~/services/users.service'
 import { jwtDecode } from 'jwt-decode'
+import { pick } from 'lodash'
 
 export const loginController = async (req: Request, res: Response) => {
   const { user }: any = req
@@ -44,5 +50,54 @@ export const getMeController = async (req: Request, res: Response) => {
   return res.status(200).json({
     message: USER_MESSAGE.GET_ME_SUCCESS,
     data: user
+  })
+}
+
+export const updateMeController = async (
+  req: Request<ParamsDictionary, any, UpdateMeRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.headers.authorization || ''
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  const user_id: string = decoded.user_id
+  const body = pick(req.body, [
+    'name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'username',
+    'avatar',
+    'cover_photo'
+  ])
+  const user = await userService.updateMe(user_id, body)
+  return res.status(200).json({
+    message: USER_MESSAGE.UPDATE_ME_SUCCESS,
+    data: user
+  })
+}
+
+export const getProfileController = async (req: Request, res: Response, next: NextFunction) => {
+  const user_nanme = req.params.username
+  const user = await userService.getProfile(user_nanme)
+  return res.status(200).json({
+    message: USER_MESSAGE.GET_PROFILE_SUCCESS,
+    data: user
+  })
+}
+
+export const followController = async (
+  req: Request<ParamsDictionary, any, FollowRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.headers.authorization || ''
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  const user_id: string = decoded.user_id
+  const followed_user_id: string = req.body.followed_user_id
+  const result = await userService.followUser(user_id, followed_user_id)
+  return res.status(200).json({
+    message: result
   })
 }
