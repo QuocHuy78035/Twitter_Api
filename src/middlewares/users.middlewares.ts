@@ -1,5 +1,5 @@
 import { error } from 'console'
-import { checkSchema } from 'express-validator'
+import { check, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import HTTP_STATUS from '~/constants/http.status'
 import { USER_MESSAGE } from '~/constants/message'
@@ -20,7 +20,7 @@ export const loginValidator = validate(
         notEmpty: {
           errorMessage: USER_MESSAGE.EMAIL_IS_REQUIRED
         },
-        trim: true,
+        //trim: true,
         isLength: {
           errorMessage: USER_MESSAGE.EMAIL_LENGTH_MUST_BE_6_TO_255,
           options: {
@@ -58,7 +58,7 @@ export const loginValidator = validate(
         },
         notEmpty: true,
         isString: true,
-        trim: true,
+        //trim: true,
         isLength: {
           errorMessage: USER_MESSAGE.PASSWORD_LENGTH_MUST_BE_6_255,
           options: {
@@ -79,12 +79,12 @@ export const registerValidator = validate(
         notEmpty: {
           errorMessage: USER_MESSAGE.NAME_IS_REQUIRED
         },
-        trim: true,
+        //trim: true,
         isString: {
           errorMessage: USER_MESSAGE.NAME_IS_STRING
         },
         isLength: {
-          errorMessage: USER_MESSAGE.NAME_LENGTH_MUST_BE_1_TO_100,
+          errorMessage: USER_MESSAGE.NAME_LENGTH_MUST_BE_3_TO_100,
           options: {
             min: 1,
             max: 100
@@ -98,7 +98,7 @@ export const registerValidator = validate(
         notEmpty: {
           errorMessage: USER_MESSAGE.EMAIL_IS_REQUIRED
         },
-        trim: true,
+        //trim: true,
         isLength: {
           errorMessage: USER_MESSAGE.EMAIL_LENGTH_MUST_BE_6_TO_255,
           options: {
@@ -129,7 +129,7 @@ export const registerValidator = validate(
         },
         notEmpty: true,
         isString: true,
-        trim: true,
+        //trim: true,
         isLength: {
           errorMessage: USER_MESSAGE.PASSWORD_LENGTH_MUST_BE_6_255,
           options: {
@@ -161,7 +161,7 @@ export const registerValidator = validate(
           errorMessage: USER_MESSAGE.COMFIRM_PASSWORD_IS_REQUIRED
         },
         isString: true,
-        trim: true,
+        //trim: true,
         isLength: {
           errorMessage: USER_MESSAGE.CONFIRM_PASSWORD_LENGTH_MUST_BE_6_255,
           options: {
@@ -253,6 +253,72 @@ export const refreshTokenValidator = validate(
               throw e
             }
           }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: {
+        optional: true,
+        //trim: true,
+        isString: {
+          errorMessage: USER_MESSAGE.NAME_IS_STRING
+        },
+        isLength: {
+          errorMessage: USER_MESSAGE.NAME_LENGTH_MUST_BE_3_TO_100,
+          options: {
+            min: 3,
+            max: 100
+          }
+        }
+      },
+      date_of_birth: {
+        optional: true,
+        isISO8601: {
+          errorMessage: USER_MESSAGE.DATE_OF_BIRTH_MUST_BE_ISO8601_FORMAT,
+          options: {
+            strict: true,
+            strictSeparator: true
+          }
+        }
+      },
+      bio: {
+        optional: true
+      },
+      location: {
+        optional: true,
+        //trim: true,
+        isString: {
+          errorMessage: USER_MESSAGE.LOCATION_MUST_BE_A_STRING
+        }
+      },
+      website: {
+        optional: true,
+        isString: {
+          errorMessage: USER_MESSAGE.WEBSITE_MUST_BE_A_STRING
+        }
+      },
+      username: {
+        optional: true,
+        isString: {
+          errorMessage: USER_MESSAGE.USER_NAME_MUST_BE_A_STRING
+        }
+      },
+      avatar: {
+        optional: true,
+        isString: {
+          errorMessage: USER_MESSAGE.AVATAR_MUST_BE_A_STRING
+        }
+      },
+      cover_photo: {
+        optional: true,
+        isString: {
+          errorMessage: USER_MESSAGE.COVER_PHOTO_MUST_BE_A_STRING
         }
       }
     },

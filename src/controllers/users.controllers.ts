@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { USER_MESSAGE } from '~/constants/message'
-import { RegisterRequestBody } from '~/models/requests/User.requests'
+import { RegisterRequestBody, TokenPayLoad } from '~/models/requests/User.requests'
 import userService from '~/services/users.service'
+import { jwtDecode } from 'jwt-decode'
 
 export const loginController = async (req: Request, res: Response) => {
   const { user }: any = req
@@ -32,5 +33,16 @@ export const logoutController = async (req: Request, res: Response) => {
   await userService.logout(refresh_token)
   return res.status(200).json({
     message: USER_MESSAGE.LOGOUT_SUCCESS
+  })
+}
+
+export const getMeController = async (req: Request, res: Response) => {
+  const token = req.headers.authorization || ''
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  const user_id: string = decoded.user_id
+  const user = await userService.getMe(user_id)
+  return res.status(200).json({
+    message: USER_MESSAGE.GET_ME_SUCCESS,
+    data: user
   })
 }

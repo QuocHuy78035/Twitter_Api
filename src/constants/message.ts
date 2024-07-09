@@ -1,6 +1,6 @@
 export const USER_MESSAGE = {
   VALIDATION_ERROR: 'Validation error',
-  NAME_LENGTH_MUST_BE_1_TO_100: 'Name length must be from 1 to 100',
+  NAME_LENGTH_MUST_BE_3_TO_100: 'Name length must be from 3 to 100',
   NAME_IS_REQUIRED: 'Name is required',
   NAME_IS_STRING: 'Name must be a string',
   EMAIL_IS_REQUIRED: `Email is required`,
@@ -24,5 +24,11 @@ export const USER_MESSAGE = {
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
   LOGIN_SUCCESS: 'Login user successfully!',
   REGISTER_SUCCESS: 'Register user successfully!',
-  LOGOUT_SUCCESS: 'Log out user successfully!'
+  LOGOUT_SUCCESS: 'Log out user successfully!',
+  GET_ME_SUCCESS: `Get me successfully`,
+  LOCATION_MUST_BE_A_STRING: `Location must be a string`,
+  WEBSITE_MUST_BE_A_STRING: `Website must be a string`,
+  USER_NAME_MUST_BE_A_STRING: `Username must be a string`,
+  AVATAR_MUST_BE_A_STRING: 'Avatar must be a string',
+  COVER_PHOTO_MUST_BE_A_STRING: `Cover photo must be a string`
 }

@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import { loginController, logoutController, registerController } from '~/controllers/users.controllers'
+import { getMeController, loginController, logoutController, registerController } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
   loginValidator,
   refreshTokenValidator,
-  registerValidator
+  registerValidator,
+  updateMeValidator
 } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -34,5 +35,22 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
  -Body: {refresh_token: string}
 */
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
+
+/*
+ - Description: get info user
+ - Path: /me
+ - Method: Get
+ - Header: {Authorization: Bearer <access_token>}
+*/
+userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
+
+/*
+ - Description: update info user
+ - Path: /me
+ - Method: Patch
+ - Header: {Authorization: Bearer <access_token>}
+ - Body: UserSchema
+*/
+userRouter.patch('/me', accessTokenValidator, updateMeValidator, wrapRequestHandler(getMeController))
 
 export default userRouter
