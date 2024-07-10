@@ -6,6 +6,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  refreshTokenController,
   registerController,
   unFollowUserController,
   updateMeController
@@ -48,6 +49,14 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
  -Body: {refresh_token: string}
 */
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
+
+/*
+ - Description: Refresh token
+ - Path: /refresh-token
+ - Method: Post
+ - Body: {refresh_token: string}
+*/
+userRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 
 /*
  - Description: get info user

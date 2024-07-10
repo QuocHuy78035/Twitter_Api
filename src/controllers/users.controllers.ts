@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { USER_MESSAGE } from '~/constants/message'
 import {
   FollowRequestBody,
+  RefreshTokenRequestBody,
   RegisterRequestBody,
   TokenPayLoad,
   UnFollowRequestParams,
@@ -40,6 +41,20 @@ export const logoutController = async (req: Request, res: Response) => {
   await userService.logout(refresh_token)
   return res.status(200).json({
     message: USER_MESSAGE.LOGOUT_SUCCESS
+  })
+}
+
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenRequestBody>,
+  res: Response
+) => {
+  const { refresh_token } = req.body
+  const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(refresh_token)
+  const user_id: string = decoded.user_id
+  const result = await userService.refreshToken(user_id, refresh_token)
+  return res.status(200).json({
+    message: USER_MESSAGE.REFRESH_TOKEN_SUCCESS,
+    tokens: result
   })
 }
 

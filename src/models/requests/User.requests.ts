@@ -34,6 +34,10 @@ export interface UnFollowRequestParams {
   user_id: string
 }
 
+export interface RefreshTokenRequestBody {
+  refresh_token: string
+}
+
 // export interface ToKenPayload extends JwtPayload {
 //   user_id: string
 //   token_type: TokenType

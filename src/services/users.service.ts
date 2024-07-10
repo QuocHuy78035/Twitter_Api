@@ -80,6 +80,21 @@ class UsersService {
     await databaseService.refreshToken.deleteOne({ token: refresh_token })
   }
 
+  async refreshToken(user_id: string, refresh_token: string) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id),
+      databaseService.refreshToken.deleteOne({ token: refresh_token })
+    ])
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token })
+    )
+    return {
+      new_access_token,
+      new_refresh_token
+    }
+  }
+
   async getMe(user_id: string) {
     const user = await databaseService.users.findOne(
       { _id: new ObjectId(user_id) },
