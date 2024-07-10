@@ -6,9 +6,11 @@ import mediaRouter from './routes/medias.routes'
 import { initFolder } from './utils/file'
 import { UPLOAD_DIR } from './constants/dir'
 import tweetsRouter from './routes/tweets.routes'
+import { config } from 'dotenv'
 const app = express()
+config()
 
-const PORT = 3000
+const port = process.env.PORT || 4000
 
 initFolder()
 
@@ -21,6 +23,6 @@ app.use(defaultErrorHandler)
 
 databaseService.connect()
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`)
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`)
 })

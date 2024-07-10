@@ -35,6 +35,7 @@ export const createTweetValidator = validate(
           if (type == TweetType.Tweet && value != null) {
             throw new Error(TWEET_MESSAGE.PARENT_ID_MUST_BE_NULL)
           }
+          return true
         }
       }
     },
@@ -59,6 +60,7 @@ export const createTweetValidator = validate(
           if (type == TweetType.ReTweet && contents != null) {
             throw new Error(TWEET_MESSAGE.COTENT_MUST_BE_EMPTY_STRING)
           }
+          return true
         }
       }
     },
@@ -70,6 +72,7 @@ export const createTweetValidator = validate(
           if (!value.every((item: any) => typeof item == 'string')) {
             throw new Error(TWEET_MESSAGE.HASHTAG_MUST_BE_AN_ARRAY_STRING)
           }
+          return true
         }
       }
     },
@@ -81,6 +84,7 @@ export const createTweetValidator = validate(
           if (!value.every((item: any) => ObjectId.isValid(value))) {
             throw new Error(TWEET_MESSAGE.MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID)
           }
+          return true
         }
       }
     },
@@ -88,14 +92,21 @@ export const createTweetValidator = validate(
       isArray: true,
       custom: {
         options: (value, { req }) => {
+          // console.log(1)
+          // const result = value.some((item: any) => {
+          //   return typeof item.url != 'string' || !media_type.includes(item.type)
+          // })
+          // console.log('result', result)
           //yeu cau moi phan tu trong array phai la Media object
           if (
             value.some((item: any) => {
+              console.log(item.url)
               return typeof item.url != 'string' || !media_type.includes(item.type)
             })
           ) {
             throw new Error(TWEET_MESSAGE.MEDIA_MSUT_BE_AN_ARRAY_OF_MEDIA_OBJECT)
           }
+          return true
         }
       }
     }
