@@ -60,5 +60,12 @@ export const TWEET_MESSAGE = {
   COTENT_MUST_BE_EMPTY_STRING: 'Content must be a empty string',
   HASHTAG_MUST_BE_AN_ARRAY_STRING: 'Hashtags must be an array string',
   MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID: 'Mentions must be an array of user id',
-  MEDIA_MSUT_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Media must be an array of media object'
+  MEDIA_MSUT_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Media must be an array of media object',
+  CREATE_TWEET_SUCCESS: 'Create tweet successfully',
+  TWEET_ID_CANNOT_EMPTY: 'Tweet id cannot empty',
+  TWEET_WITH_TWEET_ID_NOT_FOUND: 'Tweet with tweet id not found'
+}
+
+export const BOOKMARK_MESSAGE = {
+  ADD_TWEET_TO_BOOKMARK_SUCCESS: 'Add tweet to bookmark successfully'
 }
