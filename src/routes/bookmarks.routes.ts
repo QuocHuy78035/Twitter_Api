@@ -18,12 +18,11 @@ bookMarkRouter.post('/', accessTokenValidator, bookMarkTweetValidator, wrapReque
 
 /*
  - Description: unbookmark tweet
- - Path: /
- - Method: Post
+ - Path: /tweet/:tweet_id
+ - Method: Delete
  - Header: {Authorization: Bearer <access_token>}
- - Body: {'tweet_id' : string}
 */
-bookMarkRouter.post(
+bookMarkRouter.delete(
   '/tweet/:tweet_id',
   accessTokenValidator,
   unBookmarkTweetValidator,

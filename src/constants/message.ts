@@ -70,3 +70,10 @@ export const BOOKMARK_MESSAGE = {
   ADD_TWEET_TO_BOOKMARK_SUCCESS: 'Add tweet to bookmark successfully',
   UN_BOOKMARK_SUCCESS: 'Unbookmark twwet successfully'
 }
+
+export const LIKE_MESSAGES = {
+  LIKE_TWEET_SUCCESS: 'Like tweet successfully',
+  UN_LIKE_TWEET_SUCCESS: 'Un like tweet successfully',
+  TWEET_ID_CANNOT_EMPTY: 'Tweet id cannot empty',
+  TWEET_WITH_TWEET_ID_NOT_FOUND: 'Tweet with id not found'
+}
