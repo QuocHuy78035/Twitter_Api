@@ -30,3 +30,28 @@ export const bookMarkTweetValidator = validate(
     ['body']
   )
 )
+
+export const unBookmarkTweetValidator = validate(
+  checkSchema(
+    {
+      tweet_id: {
+        notEmpty: {
+          errorMessage: TWEET_MESSAGE.TWEET_ID_CANNOT_EMPTY
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const tweet = await databaseService.tweets.findOne({ _id: value })
+            if (!tweet) {
+              throw new ErrorWithStatus({
+                message: TWEET_MESSAGE.TWEET_WITH_TWEET_ID_NOT_FOUND,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)

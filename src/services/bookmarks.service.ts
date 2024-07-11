@@ -11,6 +11,17 @@ class BookMarkService {
     )
     return result
   }
+
+  async unBookMarkTweet(user_id: string, tweet_id: string) {
+    console.log('user_id', user_id)
+    console.log('tweet_id', tweet_id)
+    const result = await databaseService.bookmarks.findOneAndDelete({
+      tweet_id: new ObjectId(tweet_id),
+      user_id: new ObjectId(user_id)
+    })
+    console.log(result)
+    return result
+  }
 }
 
 const bookMarkService = new BookMarkService()

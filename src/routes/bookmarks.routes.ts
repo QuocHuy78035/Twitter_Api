@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import { bookMarkTweetController } from '~/controllers/bookmarks.controllers'
+import { bookMarkTweetController, unBookMarkTweetController } from '~/controllers/bookmarks.controllers'
 import { uploadImageController } from '~/controllers/medias.controllers'
-import { bookMarkTweetValidator } from '~/middlewares/bookmarks.middlewares'
+import { bookMarkTweetValidator, unBookmarkTweetValidator } from '~/middlewares/bookmarks.middlewares'
 import { accessTokenValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
@@ -15,5 +15,19 @@ const bookMarkRouter = Router()
  - Body: {'tweet_id' : string}
 */
 bookMarkRouter.post('/', accessTokenValidator, bookMarkTweetValidator, wrapRequestHandler(bookMarkTweetController))
+
+/*
+ - Description: unbookmark tweet
+ - Path: /
+ - Method: Post
+ - Header: {Authorization: Bearer <access_token>}
+ - Body: {'tweet_id' : string}
+*/
+bookMarkRouter.post(
+  '/tweet/:tweet_id',
+  accessTokenValidator,
+  unBookmarkTweetValidator,
+  wrapRequestHandler(unBookMarkTweetController)
+)
 
 export default bookMarkRouter
