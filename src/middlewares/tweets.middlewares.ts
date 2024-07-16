@@ -1,14 +1,21 @@
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { MediaType, TweetAudience, TweetType } from '~/constants/enums'
-import { TWEET_MESSAGE } from '~/constants/message'
+import { MediaType, TweetAudience, TweetType, VerifyUserStatus } from '~/constants/enums'
+import { LIKE_MESSAGES, TWEET_MESSAGE, USER_MESSAGE } from '~/constants/message'
 import { numberEnumToArr } from '~/utils/commons'
 import { validate } from '~/utils/validation'
+import { Request, Response, NextFunction } from 'express'
+import databaseService from '~/services/database.service'
+import Tweet from '~/models/schemas/Tweet.schema'
+import { ErrorWithStatus } from '~/models/errors/Errors'
+import HTTP_STATUS from '~/constants/http.status'
+import { wrapRequestHandler } from '~/utils/handlers'
 
 const tweet_type = numberEnumToArr(TweetType)
 const tweet_audience = numberEnumToArr(TweetAudience)
 const media_type = numberEnumToArr(MediaType)
+
 export const createTweetValidator = validate(
   checkSchema({
     type: {
@@ -100,7 +107,6 @@ export const createTweetValidator = validate(
           //yeu cau moi phan tu trong array phai la Media object
           if (
             value.some((item: any) => {
-              console.log(item.url)
               return typeof item.url != 'string' || !media_type.includes(item.type)
             })
           ) {
@@ -111,4 +117,56 @@ export const createTweetValidator = validate(
       }
     }
   })
+)
+
+export const audienceValidator = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const tweet_id = req.params.tweet_id
+  const tweet = (await databaseService.tweets.findOne({ _id: new ObjectId(tweet_id) })) as Tweet
+  const author_id = tweet.user_id
+  const author = await databaseService.users.findOne({ _id: author_id })
+
+  if (tweet.audience == TweetAudience.TwitterCircle) {
+    const user_id = req.headers.authorization
+    if (!user_id) {
+      throw new ErrorWithStatus({ message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: HTTP_STATUS.UNAUTHORIZED })
+    }
+
+    //check user co nam trong tweet_circle cua tac gia hay ko
+    const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => user_circle_id.equals(user_id))
+    console.log(1111)
+    if (!is_in_twitter_circle) {
+      throw new ErrorWithStatus({ message: TWEET_MESSAGE.TWEET_IS_NOT_PUBLIC, status: HTTP_STATUS.FORBIDEN })
+    }
+  }
+
+  //kiem tra tai khoan cua tac gia tweet co on dinh ko (con ton tai va khong bi ban)
+  if (!author || author.verify == VerifyUserStatus.Banned) {
+    throw new ErrorWithStatus({ message: USER_MESSAGE.USER_NOT_FOUND, status: HTTP_STATUS.BAD_REQUEST })
+  }
+  next()
+})
+
+export const TweetIdValidator = validate(
+  checkSchema(
+    {
+      tweet_id: {
+        notEmpty: {
+          errorMessage: TWEET_MESSAGE.TWEET_ID_CANNOT_EMPTY
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const tweet = await databaseService.tweets.findOne({ _id: new ObjectId(value) })
+            if (!tweet) {
+              throw new ErrorWithStatus({
+                message: TWEET_MESSAGE.TWEET_WITH_TWEET_ID_NOT_FOUND,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
 )

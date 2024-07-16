@@ -10,9 +10,9 @@ import userService from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
-import { Request } from 'express'
 import { TokenPayLoad } from '~/models/requests/User.requests'
 import { jwtDecode } from 'jwt-decode'
+import { Request, Response, NextFunction } from 'express'
 
 export const loginValidator = validate(
   checkSchema(
@@ -483,3 +483,12 @@ export const ChangePasswordValidator = validate(
     ['body']
   )
 )
+
+export const IsUserLogedInValidator = (middleware: (req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next)
+    }
+    next()
+  }
+}

@@ -17,3 +17,14 @@ export const createTweetController = async (
   const tweet = await tweetService.createTweet(req.body, user_id)
   return res.json({ message: TWEET_MESSAGE.CREATE_TWEET_SUCCESS, tweet })
 }
+
+export const getTweetController = async (
+  req: Request<ParamsDictionary, any, TweetRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  // const token = req.headers.authorization || ''
+  // const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+  // const user_id: string = decoded.user_id
+  return res.json({ message: TWEET_MESSAGE.GET_TWEET_SUCCESS })
+}

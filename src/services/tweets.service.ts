@@ -23,7 +23,6 @@ class TweetsService {
 
   async createTweet(body: TweetRequestBody, user_id: string) {
     const hashTagObjectId = await this.checkAndCreateHashtag(body.hashtags)
-    console.log(hashTagObjectId)
     const result = await databaseService.tweets.insertOne(
       new Tweet({
         user_id: new ObjectId(user_id),

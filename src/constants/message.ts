@@ -63,7 +63,9 @@ export const TWEET_MESSAGE = {
   MEDIA_MSUT_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Media must be an array of media object',
   CREATE_TWEET_SUCCESS: 'Create tweet successfully',
   TWEET_ID_CANNOT_EMPTY: 'Tweet id cannot empty',
-  TWEET_WITH_TWEET_ID_NOT_FOUND: 'Tweet with tweet id not found'
+  TWEET_WITH_TWEET_ID_NOT_FOUND: 'Tweet with tweet id not found',
+  GET_TWEET_SUCCESS: 'Get tweet successfully',
+  TWEET_IS_NOT_PUBLIC: 'Tweet is not public'
 }
 
 export const BOOKMARK_MESSAGE = {
