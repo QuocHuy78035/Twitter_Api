@@ -11,6 +11,8 @@ import Tweet from '~/models/schemas/Tweet.schema'
 import { ErrorWithStatus } from '~/models/errors/Errors'
 import HTTP_STATUS from '~/constants/http.status'
 import { wrapRequestHandler } from '~/utils/handlers'
+import { TokenPayLoad } from '~/models/requests/User.requests'
+import { jwtDecode } from 'jwt-decode'
 
 const tweet_type = numberEnumToArr(TweetType)
 const tweet_audience = numberEnumToArr(TweetAudience)
@@ -126,17 +128,33 @@ export const audienceValidator = wrapRequestHandler(async (req: Request, res: Re
   const author = await databaseService.users.findOne({ _id: author_id })
 
   if (tweet.audience == TweetAudience.TwitterCircle) {
-    const user_id = req.headers.authorization
-    if (!user_id) {
+    const token = req.headers.authorization || ''
+    if (!token) {
       throw new ErrorWithStatus({ message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: HTTP_STATUS.UNAUTHORIZED })
     }
 
+    const length: number = author?.user_id_circle.length as number
+    const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token.substring(7))
+    const user_id: string = decoded.user_id
+
     //check user co nam trong tweet_circle cua tac gia hay ko
-    const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => user_circle_id.equals(user_id))
-    console.log(1111)
+    // const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => user_circle_id.equals(user_id))
+    // console.log(author?.user_id_circle.length)
+    const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => {
+      try {
+        if (user_circle_id == new ObjectId(user_id)) {
+          return true
+        }
+        return user_circle_id === new ObjectId(user_id)
+      } catch (error) {
+        return false
+      }
+    })
+
     if (!is_in_twitter_circle) {
       throw new ErrorWithStatus({ message: TWEET_MESSAGE.TWEET_IS_NOT_PUBLIC, status: HTTP_STATUS.FORBIDEN })
     }
+    next()
   }
 
   //kiem tra tai khoan cua tac gia tweet co on dinh ko (con ton tai va khong bi ban)

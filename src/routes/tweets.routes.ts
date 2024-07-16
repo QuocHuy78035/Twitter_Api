@@ -16,10 +16,10 @@ const tweetsRouter = Router()
 tweetsRouter.post('/', accessTokenValidator, createTweetValidator, wrapRequestHandler(createTweetController))
 
 /*
- - Description: create tweet
- - Path: /
- - Method: Post
- - Header: {Authorization: Bearer <access_token>} *Option
+ - Description: get tweet detail
+ - Path: /:tweet_id
+ - Method: get
+ - Header: {Authorization: Bearer <access_token>}
  - Params: tweet_id: string
 */
 tweetsRouter.get(
