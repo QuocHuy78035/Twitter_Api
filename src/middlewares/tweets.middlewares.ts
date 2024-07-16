@@ -2,7 +2,7 @@ import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { MediaType, TweetAudience, TweetType, VerifyUserStatus } from '~/constants/enums'
-import { LIKE_MESSAGES, TWEET_MESSAGE, USER_MESSAGE } from '~/constants/message'
+import { TWEET_MESSAGE, USER_MESSAGE } from '~/constants/message'
 import { numberEnumToArr } from '~/utils/commons'
 import { validate } from '~/utils/validation'
 import { Request, Response, NextFunction } from 'express'
@@ -66,7 +66,7 @@ export const createTweetValidator = validate(
             throw new Error(TWEET_MESSAGE.CONTENT_MUST_BE_A_NON_EMPTY_STRING)
           }
           //if type is retweet => content is null
-          if (type == TweetType.ReTweet && contents != null) {
+          if (type == TweetType.ReTweet && contents != '') {
             throw new Error(TWEET_MESSAGE.COTENT_MUST_BE_EMPTY_STRING)
           }
           return true
@@ -88,11 +88,22 @@ export const createTweetValidator = validate(
     mentions: {
       isArray: true,
       custom: {
-        options: (value, { req }) => {
+        options: async (value, { req }) => {
+          // const user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+          // if (!user) {
+          //   throw new ErrorWithStatus({ message: USER_MESSAGE.USER_NOT_FOUND, status: HTTP_STATUS.BAD_REQUEST })
+          // }
+
           //yeu cau moi phan tu trong array phai la user_id (Object id)
-          if (!value.every((item: any) => ObjectId.isValid(value))) {
-            throw new Error(TWEET_MESSAGE.MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID)
+          const length = value.length
+          for (let i = 0; i < length; i++) {
+            if (!ObjectId.isValid(value[i])) {
+              throw new Error(TWEET_MESSAGE.MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID)
+            }
           }
+          // if (!value.every((item: any) => ObjectId.isValid(new ObjectId(value)))) {
+          //   throw new Error(TWEET_MESSAGE.MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID)
+          // }
           return true
         }
       }
@@ -124,43 +135,46 @@ export const createTweetValidator = validate(
 export const audienceValidator = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
   const tweet_id = req.params.tweet_id
   const tweet = (await databaseService.tweets.findOne({ _id: new ObjectId(tweet_id) })) as Tweet
-  const author_id = tweet.user_id
-  const author = await databaseService.users.findOne({ _id: author_id })
 
   if (tweet.audience == TweetAudience.TwitterCircle) {
     const token = req.headers.authorization || ''
+    const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token)
+    const user_id = decoded.user_id
     if (!token) {
       throw new ErrorWithStatus({ message: USER_MESSAGE.ACCESS_TOKEN_IS_REQUIRED, status: HTTP_STATUS.UNAUTHORIZED })
     }
 
-    const length: number = author?.user_id_circle.length as number
-    const decoded: TokenPayLoad = jwtDecode<TokenPayLoad>(token.substring(7))
-    const user_id: string = decoded.user_id
-
-    //check user co nam trong tweet_circle cua tac gia hay ko
-    // const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => user_circle_id.equals(user_id))
-    // console.log(author?.user_id_circle.length)
-    const is_in_twitter_circle = author?.user_id_circle.some((user_circle_id) => {
-      try {
-        if (user_circle_id == new ObjectId(user_id)) {
-          return true
-        }
-        return user_circle_id === new ObjectId(user_id)
-      } catch (error) {
-        return false
-      }
-    })
-
-    if (!is_in_twitter_circle) {
-      throw new ErrorWithStatus({ message: TWEET_MESSAGE.TWEET_IS_NOT_PUBLIC, status: HTTP_STATUS.FORBIDEN })
+    //kiem tra tai khoan cua tac gia tweet co on dinh ko (con ton tai va khong bi ban)
+    const author_id = tweet.user_id
+    const author = await databaseService.users.findOne({ _id: author_id })
+    if (!author || author.verify == VerifyUserStatus.Banned) {
+      throw new ErrorWithStatus({ message: USER_MESSAGE.USER_NOT_FOUND, status: HTTP_STATUS.BAD_REQUEST })
     }
-    next()
+
+    //kiem tra nguoi xem tweet co nam trong tweet circle cua tac gia hay ko
+    // if (!author.user_id_circle) {
+    //   throw new ErrorWithStatus({
+    //     message: '123',
+    //     status: HTTP_STATUS.INTERNAL_SERVER_ERROR
+    //   })
+    // }
+
+    const length = author.user_id_circle.length ?? 0
+    let is_in_tweet_circle = false
+    for (let i = 0; i < length; i++) {
+      if (author.user_id_circle[0].toString() == user_id) {
+        is_in_tweet_circle = true
+      }
+    }
+
+    if (!is_in_tweet_circle || !author) {
+      throw new ErrorWithStatus({
+        message: TWEET_MESSAGE.TWEET_IS_NOT_PUBLIC,
+        status: HTTP_STATUS.FORBIDEN
+      })
+    }
   }
 
-  //kiem tra tai khoan cua tac gia tweet co on dinh ko (con ton tai va khong bi ban)
-  if (!author || author.verify == VerifyUserStatus.Banned) {
-    throw new ErrorWithStatus({ message: USER_MESSAGE.USER_NOT_FOUND, status: HTTP_STATUS.BAD_REQUEST })
-  }
   next()
 })
 
