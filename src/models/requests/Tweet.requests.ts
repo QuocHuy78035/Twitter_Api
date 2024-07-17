@@ -1,5 +1,5 @@
 import { TweetAudience, TweetType } from '~/constants/enums'
-import { Media } from '../others'
+import { Media } from '../Others'
 
 export interface TweetRequestBody {
   type: TweetType

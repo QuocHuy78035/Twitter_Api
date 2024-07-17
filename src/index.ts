@@ -9,6 +9,8 @@ import tweetsRouter from './routes/tweets.routes'
 import { config } from 'dotenv'
 import bookMarkRouter from './routes/bookmarks.routes'
 import likeRouter from './routes/likes.routes'
+// import '~/utils/fake'
+
 const app = express()
 config()
 
