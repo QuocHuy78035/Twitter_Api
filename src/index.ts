@@ -9,6 +9,7 @@ import tweetsRouter from './routes/tweets.routes'
 import { config } from 'dotenv'
 import bookMarkRouter from './routes/bookmarks.routes'
 import likeRouter from './routes/likes.routes'
+import searchsRouter from './routes/searchs.routes'
 // import '~/utils/fake'
 
 const app = express()
@@ -22,6 +23,7 @@ app.use('/static/image/', express.static(UPLOAD_DIR))
 app.use(express.json()) //hoan doi json gui tu client thanh object
 app.use('/users', userRouter)
 app.use('/likes', likeRouter)
+app.use('/searchs', searchsRouter)
 app.use('/bookmarks', bookMarkRouter)
 app.use('/medias', mediaRouter)
 app.use('/tweets', tweetsRouter)
