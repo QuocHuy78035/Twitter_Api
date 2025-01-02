@@ -24,3 +24,6 @@ class BookMarkService {
 const bookMarkService = new BookMarkService()
 
 export default bookMarkService
+
+
+//kkk this is dev2
